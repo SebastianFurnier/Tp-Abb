@@ -213,7 +213,8 @@ void abb_con_cada_elemento_postorden(nodo_abb_t *raiz,
 					invocaciones, continuar);
 	abb_con_cada_elemento_postorden(raiz->derecha, funcion, aux,
 					invocaciones, continuar);
-
+	if (!(*continuar))
+		return;
 	(*continuar) = funcion(raiz->elemento, aux);
 	(*invocaciones)++;
 	return;

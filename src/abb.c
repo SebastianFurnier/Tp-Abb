@@ -3,7 +3,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 #define VACIO 0
 
@@ -136,9 +135,8 @@ void *abb_buscar_recursivo(nodo_abb_t *raiz, void *elemento,
 	if (!raiz)
 		return NULL;
 
-	int comparacion;
 	elemento_aux = raiz->elemento;
-	comparacion = comparador(elemento, elemento_aux);
+	int comparacion = comparador(elemento, elemento_aux);
 
 	if (comparacion < 0)
 		elemento_aux = abb_buscar_recursivo(raiz->izquierda, elemento,
@@ -173,14 +171,14 @@ size_t abb_tamanio(abb_t *arbol)
 	return arbol->tamanio;
 }
 
-void abb_destruir_recursivo(nodo_abb_t *raiz)
+void abb_destruir_todo_recursivo(nodo_abb_t *raiz, void (*destructor)(void *))
 {
 	if (!raiz)
 		return;
-
-	abb_destruir_recursivo(raiz->izquierda);
-	abb_destruir_recursivo(raiz->derecha);
-
+	abb_destruir_todo_recursivo(raiz->izquierda, destructor);
+	if (destructor != NULL)
+		destructor(raiz->elemento);
+	abb_destruir_todo_recursivo(raiz->derecha, destructor);
 	free(raiz);
 	return;
 }
@@ -189,21 +187,8 @@ void abb_destruir(abb_t *arbol)
 {
 	if (!arbol)
 		return;
-	abb_destruir_recursivo(arbol->nodo_raiz);
+	abb_destruir_todo_recursivo(arbol->nodo_raiz, NULL);
 	free(arbol);
-	return;
-}
-
-void abb_destuir_todo_recursivo(nodo_abb_t *raiz, void (*destructor)(void *))
-{
-	if (!raiz)
-		return;
-	abb_destuir_todo_recursivo(raiz->izquierda, destructor);
-	if (destructor != NULL)
-		destructor(raiz->elemento);
-
-	abb_destuir_todo_recursivo(raiz->derecha, destructor);
-
 	return;
 }
 
@@ -211,8 +196,8 @@ void abb_destruir_todo(abb_t *arbol, void (*destructor)(void *))
 {
 	if (!arbol)
 		return;
-	abb_destuir_todo_recursivo(arbol->nodo_raiz, destructor);
-	abb_destruir(arbol);
+	abb_destruir_todo_recursivo(arbol->nodo_raiz, destructor);
+	free(arbol);
 
 	return;
 }
@@ -228,8 +213,7 @@ void abb_con_cada_elemento_postorden(nodo_abb_t *raiz,
 					invocaciones, continuar);
 	abb_con_cada_elemento_postorden(raiz->derecha, funcion, aux,
 					invocaciones, continuar);
-	if (!(*continuar))
-		return;
+
 	(*continuar) = funcion(raiz->elemento, aux);
 	(*invocaciones)++;
 	return;
@@ -243,8 +227,7 @@ void abb_con_cada_elemento_preorden(nodo_abb_t *raiz,
 		return;
 
 	(*continuar) = funcion(raiz->elemento, aux);
-	if (continuar)
-		(*invocaciones)++;
+	(*invocaciones)++;
 	abb_con_cada_elemento_preorden(raiz->izquierda, funcion, aux,
 				       invocaciones, continuar);
 	abb_con_cada_elemento_preorden(raiz->derecha, funcion, aux,
@@ -296,58 +279,40 @@ size_t abb_con_cada_elemento(abb_t *arbol, abb_recorrido recorrido,
 	return cantidad_invocaciones;
 }
 
-void abb_recorrer_postorden(nodo_abb_t *raiz, void **array,
-			    size_t tamanio_array, size_t *elementos_guardados)
+void guardar_en_arreglo(nodo_abb_t *raiz, void **array, size_t tamanio_array,
+			size_t *elementos_guardados)
 {
-	if (!raiz)
-		return;
-
-	abb_recorrer_postorden(raiz->izquierda, array, tamanio_array,
-			       elementos_guardados);
-	abb_recorrer_postorden(raiz->derecha, array, tamanio_array,
-			       elementos_guardados);
-
 	if ((*elementos_guardados) < tamanio_array) {
 		array[(*elementos_guardados)] = raiz->elemento;
 		(*elementos_guardados)++;
 	}
-
-	return;
 }
 
-void abb_recorrer_preorden(nodo_abb_t *raiz, void **array, size_t tamanio_array,
-			   size_t *elementos_guardados)
+void abb_recorrer_recursivo(nodo_abb_t *raiz, void **array,
+			    size_t tamanio_array, size_t *elementos_guardados,
+			    abb_recorrido recorrido)
 {
 	if (!raiz)
 		return;
 
-	if ((*elementos_guardados) < tamanio_array) {
-		array[(*elementos_guardados)] = raiz->elemento;
-		(*elementos_guardados)++;
-	}
+	if (recorrido == PREORDEN)
+		guardar_en_arreglo(raiz, array, tamanio_array,
+				   elementos_guardados);
 
-	abb_recorrer_preorden(raiz->izquierda, array, tamanio_array,
-			      elementos_guardados);
-	abb_recorrer_preorden(raiz->derecha, array, tamanio_array,
-			      elementos_guardados);
+	abb_recorrer_recursivo(raiz->izquierda, array, tamanio_array,
+			       elementos_guardados, recorrido);
 
-	return;
-}
+	if (recorrido == INORDEN)
+		guardar_en_arreglo(raiz, array, tamanio_array,
+				   elementos_guardados);
 
-void abb_recorrer_inorden(nodo_abb_t *raiz, void **array, size_t tamanio_array,
-			  size_t *elementos_guardados)
-{
-	if (!raiz)
-		return;
+	abb_recorrer_recursivo(raiz->derecha, array, tamanio_array,
+			       elementos_guardados, recorrido);
 
-	abb_recorrer_inorden(raiz->izquierda, array, tamanio_array,
-			     elementos_guardados);
-	if ((*elementos_guardados) < tamanio_array) {
-		array[(*elementos_guardados)] = raiz->elemento;
-		(*elementos_guardados)++;
-	}
-	abb_recorrer_inorden(raiz->derecha, array, tamanio_array,
-			     elementos_guardados);
+	if (recorrido == POSTORDEN)
+		guardar_en_arreglo(raiz, array, tamanio_array,
+				   elementos_guardados);
+
 	return;
 }
 
@@ -359,15 +324,8 @@ size_t abb_recorrer(abb_t *arbol, abb_recorrido recorrido, void **array,
 
 	size_t elementos_guardados = 0;
 
-	if (recorrido == INORDEN)
-		abb_recorrer_inorden(arbol->nodo_raiz, array, tamanio_array,
-				     &elementos_guardados);
-	else if (recorrido == PREORDEN)
-		abb_recorrer_preorden(arbol->nodo_raiz, array, tamanio_array,
-				      &elementos_guardados);
-	else if (recorrido == POSTORDEN)
-		abb_recorrer_postorden(arbol->nodo_raiz, array, tamanio_array,
-				       &elementos_guardados);
+	abb_recorrer_recursivo(arbol->nodo_raiz, array, tamanio_array,
+			       &elementos_guardados, recorrido);
 
 	return elementos_guardados;
 }

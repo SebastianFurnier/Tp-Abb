@@ -7,11 +7,62 @@ int comparador_enteros(void *valor1, void *valor2)
 	return *(int *)(valor1) - *(int *)(valor2);
 }
 
+bool comparador_mayor_booleano(void *valor1, void *valor2)
+{
+	if (*(int *)valor1 > *(int *)valor2)
+		return true;
+	return false;
+}
+
 void sumar_uno(void *valor1)
 {
 	int *auxiliar = (int *)valor1;
 	(*auxiliar)++;
 	valor1 = (void *)auxiliar;
+}
+
+void prueba_abb_cada_elemento()
+{
+	abb_t *arbol = abb_crear(comparador_enteros);
+	if (!arbol)
+		return;
+
+	int valor1 = 544;
+	int valor2 = 900;
+	int valor3 = 16;
+	int valor4 = 45;
+	int valor5 = 560;
+	int valor6 = 15;
+	int auxiliar = 1000;
+	size_t cantidad_invocaciones = 0;
+
+	abb_insertar(arbol, &valor1);
+	abb_insertar(arbol, &valor2);
+	abb_insertar(arbol, &valor3);
+	abb_insertar(arbol, &valor4);
+	abb_insertar(arbol, &valor5);
+	abb_insertar(arbol, &valor6);
+
+	cantidad_invocaciones = abb_con_cada_elemento(
+		arbol, INORDEN, comparador_mayor_booleano, &auxiliar);
+	pa2m_afirmar(cantidad_invocaciones == 1,
+		     "La funcion se invoco la cantidad de veces esperada.");
+
+	auxiliar = 500;
+	cantidad_invocaciones = abb_con_cada_elemento(
+		arbol, INORDEN, comparador_mayor_booleano, &auxiliar);
+	pa2m_afirmar(
+		cantidad_invocaciones == 1,
+		"Cambiando el auxiliar, la funcion se invoca la cantidad de veces esperadas.");
+
+	auxiliar = 1;
+	cantidad_invocaciones = abb_con_cada_elemento(
+		arbol, POSTORDEN, comparador_mayor_booleano, &auxiliar);
+	pa2m_afirmar(
+		cantidad_invocaciones == 6,
+		"Cambiando el auxiliar y el recorrido, la funcion se invoca la cantidad de veces esperadas.");
+
+	abb_destruir(arbol);
 }
 
 void pruebas_abb_a_array()
@@ -225,5 +276,7 @@ int main()
 	pruebas_destruir_todo();
 	pa2m_nuevo_grupo("Pruebas con Arrays");
 	pruebas_abb_a_array();
+	pa2m_nuevo_grupo("Pruebas funcion a cada elemento.");
+	prueba_abb_cada_elemento();
 	return pa2m_mostrar_reporte();
 }

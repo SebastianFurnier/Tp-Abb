@@ -4,6 +4,12 @@ CC = gcc
 
 all: clean valgrind-alumno
 
+tp-compilar:
+	$(CC) $(CFLAGS) src/*.c pruebas_alumno.c -o tp_abb
+tp-valgrind:
+	valgrind $(VALGRIND_FLAGS) ./tp_abb
+tp-correr:
+	./tp_abb
 
 valgrind-chanutron: pruebas_chanutron
 	valgrind $(VALGRIND_FLAGS) ./pruebas_chanutron

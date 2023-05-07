@@ -5,19 +5,18 @@
 - Para compilar:
 
 ```bash
-línea de compilación
-
+make tp-compilar
 ```
 
 - Para ejecutar:
 
 ```bash
-línea de ejecución
+make tp-correr
 ```
 
 - Para ejecutar con valgrind:
 ```bash
-línea con valgrind
+make tp-valgrind
 ```
 ---
 ##  Funcionamiento
@@ -28,7 +27,7 @@ La estructura usada para el arbol consta de un nodo raiz (el cual nos servira de
 
 Las estructuras de los nodos guardan un puntero a un elemento de cualquier tipo y 2 punteros a otros nodos, izquierda y derecha. Por convencion se toma que los elementos ingresados que sean menores al guardado en el nodo raiz, se "acomodaran" hacia el lado izquierdo y los mayores, hacia la derecha.
 
-La implementacion provee de las funciones publicas basicas para la creacion y uso de un arbol binario. Adicionalmente inclui funciones privadas que ayudaron a la correcta implementacion del arbol. Ejemplo de esto es la funcion abb_buscar_recursivo que es llamada desde abb_buscar pasando por parametro el nodo raiz, el elemento buscando, la funcion comparacion y un auxiliar. Esta funcion compara el elemento buscado con el guardado en el nodo raiz,  en caso de la funcion comparacion devolver un valor negativo se vuelve a invocar a la funcion abb_buscar_recursivo pero cambiando el parametro del nodo, pasando el izquierdo del nodo ya evaluado. De igual manera si de la funcion comparacion se obtiene un valor positivo, se hace el mismo procedimiento pasando por parametro el nodo derecho al actual.
+La implementacion provee de las funciones publicas basicas para la creacion y uso de un arbol binario. Adicionalmente inclui funciones privadas que ayudaron a la correcta implementacion del arbol. Ejemplo de esto es la funcion abb_buscar_recursivo que es llamada desde abb_buscar pasando por parametro el nodo raiz, el elemento buscado, la funcion comparacion y un auxiliar. Esta funcion compara el elemento buscado con el guardado en el nodo raiz,  en caso de la funcion comparacion devolver un valor negativo se vuelve a invocar a la funcion abb_buscar_recursivo pero cambiando el parametro del nodo, pasando el izquierdo del nodo ya evaluado. De igual manera si de la funcion comparacion se obtiene un valor positivo, se hace el mismo procedimiento pasando por parametro el nodo derecho al actual.
 
 
 ---
@@ -68,6 +67,30 @@ En el siguiente diagrama de ejemplo se muestra un ABB, donde se toma por convenc
 <div align="center">
 <img width="70%" src="img/abb.png">
 </div>
+
+---
+
+## Operaciones basicas y complejidades.
+
+    Crear: Crea un arbol vacio y devuelve el puntero a dicho tda. La complejidad de esta operacion es O(1).
+
+    Insertar: Comenzamos comparando el elemento a insertar con el guardado en el nodo raiz. Dependiendo si es mayor o menor, descartamos una u otra rama del arbol. Esta operacion es de complejidad O(log(n)).
+
+    Quitar: La funcion de quitar elimina el nodo con el elemento deseado y reacomoda el arbol para que conserve la realcion entre los elementos. Esta operacion tambien es O(log(n)).
+
+    Buscar: La funcion de buscar es muy parecida a la incersion. Comparando elementos y eligiendo la rama del arbol apropiada, la complejidad es O(log(n)).
+
+    Vacio: Esta operacion devuelve true en caso de que el arbol este vacio y false cuando no lo esta. Esta operacion es O(1).
+
+    Tamanio: Devuelve la cantidad de elementos guardados. Esta operacion es O(1).
+
+    destruir todo: Esta operacion aplica la funcion pasada por parametro a cada elemento y luego libera la memoria reservada para los nodos. Esta operacion es O(n) dado que debemos recorrer todo el arbol.
+
+    Destruir: Libera la memoria de cada nodo. Esta funcion es O(n).
+
+    Abb con cada elemento: Aplica la funcion pasada por parametro a cada elemento. Esta operacion es O(n).
+
+    Abb recorrer: Guarda cada elemento del arbol en un arreglo. Esta operacion es O(n).
 
 ---
 

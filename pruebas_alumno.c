@@ -268,7 +268,7 @@ int main()
 {
 	pa2m_nuevo_grupo("Prueba Creacion de arbol.");
 	pruebas_creacion_arbol();
-	pa2m_nuevo_grupo("Pruebas de insercion.");
+	pa2m_nuevo_grupo("Pruebas de insercion y busqueda.");
 	pruebas_de_insercion();
 	pa2m_nuevo_grupo("Pruebas de quitar elementos.");
 	pruebas_quitar_elementos();
